@@ -1,0 +1,7 @@
+.venv/
+.local_deps/
+.env
+setting.py
+.local/
+__pycache__/
+*.pyc

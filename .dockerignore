@@ -1,0 +1,13 @@
+.venv
+.local_deps
+.env
+setting.py
+.local
+.git
+tests
+docs
+*.md
+*.sqlite3
+__pycache__
+*.pyc
+static/original-fragment.html
