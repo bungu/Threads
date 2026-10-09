@@ -5,3 +5,4 @@ setting.py
 .local/
 __pycache__/
 *.pyc
+plan/

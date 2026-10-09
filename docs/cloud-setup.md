@@ -11,7 +11,9 @@
 
 2026-10-09に Threads 用 Cloud Run の Web・ワーカー、Secret Manager、5分間隔の Cloud Scheduler を配備した。管理画面は `https://threads-studio-web-154070015396.asia-northeast1.run.app`。Firestore の `(default)` データベースは東京の既存のものを使う。`threads_runtime/global.enabled` は文書がない間 `false` と扱うので、配備だけでは定期投稿しない。Scheduler からワーカーへの試験呼び出しは HTTP 200 を確認した。
 
-2026-10-10に GitHub の `bungu/Threads` へソースを push し、同じ Artifact Registry の `cloud-run-source-deploy/threads-studio:c408ac9` イメージを Web とワーカーへ配備した。通常用・閲覧用PWで公開URLにログインでき、閲覧用の投稿APIは HTTP 403 を返すことを確認した。クラウドのアカウントは現在0件で、ローカルのThreadsトークンと設定は移していない。`setting.py` はGitとビルドソースから除外し、PWと権限設定は Secret Manager の `threads-shared` に保存する。旧バージョンは無効化済み。
+2026-10-10に GitHub の公開リポジトリ `bungu/Threads` へソースを push し、同じ Artifact Registry の `cloud-run-source-deploy/threads-studio:c408ac9` イメージを Web とワーカーへ配備した。通常用・閲覧用PWで公開URLにログインでき、閲覧用の投稿APIは HTTP 403 を返すことを確認した。`setting.py` はGitとビルドソースから除外し、PWと権限設定は Secret Manager の `threads-shared` に保存する。旧バージョンは無効化済み。
+
+同日、ローカルの接続済みThreadsアカウント1件をクラウドにも登録した。Meta APIでアカウントと投稿権限を再確認し、トークンはそのアカウント専用の Secret Manager シークレットに保存した。通常用・閲覧用画面の双方で同じアカウントが1件表示され、クラウドの定期投稿はOFFである。投稿先のThreadsアカウントは共通だが、ローカルとクラウドのプロンプト・スケジュール・実行履歴は別々に保存し、自動同期しない。
 
 初回イメージの実測容量は 63,016,017 バイト（約60 MiB）。Cloud Run は両サービスとも 1 vCPU/512 MiB、最小0・最大1、リクエスト課金。Webはパスワードログイン、ワーカーはIAM認証を必須とする。
 
