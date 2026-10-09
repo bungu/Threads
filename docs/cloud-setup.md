@@ -11,7 +11,9 @@
 
 2026-10-09に Threads 用 Cloud Run の Web・ワーカー、Secret Manager、5分間隔の Cloud Scheduler を配備した。管理画面は `https://threads-studio-web-154070015396.asia-northeast1.run.app`。Firestore の `(default)` データベースは東京の既存のものを使う。`threads_runtime/global.enabled` は文書がない間 `false` と扱うので、配備だけでは定期投稿しない。Scheduler からワーカーへの試験呼び出しは HTTP 200 を確認した。
 
-同じ Artifact Registry の `cloud-run-source-deploy/threads-studio:20261009-geo` イメージを Web とワーカーで共有する。初回イメージの実測容量は 63,016,017 バイト（約60 MiB）。Cloud Run は両サービスとも 1 vCPU/512 MiB、最小0・最大1、リクエスト課金。Webはパスワードログイン、ワーカーはIAM認証を必須とする。クラウドにはローカルのThreadsトークンと設定をまだ移していない。
+2026-10-10に GitHub の `bungu/Threads` へソースを push し、同じ Artifact Registry の `cloud-run-source-deploy/threads-studio:c408ac9` イメージを Web とワーカーへ配備した。通常用・閲覧用PWで公開URLにログインでき、閲覧用の投稿APIは HTTP 403 を返すことを確認した。クラウドのアカウントは現在0件で、ローカルのThreadsトークンと設定は移していない。`setting.py` はGitとビルドソースから除外し、PWと権限設定は Secret Manager の `threads-shared` に保存する。旧バージョンは無効化済み。
+
+初回イメージの実測容量は 63,016,017 バイト（約60 MiB）。Cloud Run は両サービスとも 1 vCPU/512 MiB、最小0・最大1、リクエスト課金。Webはパスワードログイン、ワーカーはIAM認証を必須とする。
 
 Web ログインは全体で15分間に5回まで試行でき、次の試行で15分間ロックする。試行数とロック期限は Firestore の `threads_auth/login_global` に保存するため、インスタンス再起動や送信元IPの変更でも上限を回避できない。ログイン成功時に記録を消去する。ロック中は正しい文字列でもログインできず、既存セッションは引き続き有効。認証用 Firestore が利用できない場合、新規ログインは失敗する。大量の不正アクセスは本人の一時的なログイン停止や利用料金増加を起こし得る。管理者は必要に応じてこの文書を削除してロックを解除できるが、攻撃中は再びロックされる。
 
